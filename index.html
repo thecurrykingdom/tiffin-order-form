@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Tiffin – The Curry Kingdom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --curry:#C4621A; --curry-light:#FAE8D8; --curry-dark:#8B3E0A; --cream:#FDF8F3; --text:#1A1A1A; --muted:#666; --border:rgba(0,0,0,0.14); }
+    body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); min-height:100vh; }
+    .hero { background:linear-gradient(135deg,#8B3E0A 0%,#C4621A 60%,#E8853A 100%); padding:2.5rem 1.5rem 2rem; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; right:-40px; top:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.06); }
+    .hero::after  { content:''; position:absolute; left:-20px; bottom:-30px; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.04); }
+    .hero-inner { max-width:600px; margin:0 auto; position:relative; z-index:1; }
+    .hero-tag { font-size:11px; font-weight:500; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.7); margin-bottom:8px; }
+    .hero h1 { font-family:'Playfair Display',serif; font-size:clamp(24px,5vw,32px); font-weight:600; color:#fff; line-height:1.2; margin-bottom:6px; }
+    .hero p { font-size:14px; color:rgba(255,255,255,0.78); line-height:1.5; }
+    .form-body { padding:1.5rem 1.25rem 3rem; max-width:600px; margin:0 auto; }
+    .section-label { font-size:11px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; color:var(--curry); margin:1.75rem 0 0.85rem; padding-bottom:5px; border-bottom:1px solid var(--curry-light); }
+    .field { margin-bottom:1rem; }
+    .field-label { display:block; font-size:13px; font-weight:500; color:var(--muted); margin-bottom:5px; }
+    .field-label .req { color:var(--curry); }
+    input[type=text],input[type=email],input[type=tel],input[type=date],select,textarea { width:100%; border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-size:14px; font-family:'DM Sans',sans-serif; background:#fff; color:var(--text); outline:none; transition:border-color 0.15s,box-shadow 0.15s; }
+    input[type=date] { max-width:240px; cursor:pointer; }
+    input:focus,select:focus,textarea:focus { border-color:var(--curry); box-shadow:0 0 0 3px rgba(196,98,26,0.12); }
+    textarea { resize:vertical; min-height:76px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .grid3 { display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; }
+    @media(max-width:480px) { .grid2,.grid3 { grid-template-columns:1fr; } }
+    .meal-cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+    @media(max-width:460px) { .meal-cards { grid-template-columns:1fr; } }
+    .meal-card { border:1px solid var(--border); border-radius:10px; padding:13px; background:#fff; cursor:pointer; transition:all 0.15s; position:relative; }
+    .meal-card:hover { border-color:var(--curry); background:var(--curry-light); }
+    .meal-card.selected { border:2px solid var(--curry); background:var(--curry-light); }
+    .meal-card input[type=radio] { position:absolute; opacity:0; width:0; height:0; }
+    .meal-name { font-size:14px; font-weight:500; color:var(--text); }
+    .meal-serves { font-size:11px; color:var(--curry); font-weight:500; margin:2px 0 7px; }
+    .meal-items { font-size:11px; color:var(--muted); line-height:1.65; }
+    .chip-group { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+    .chip { border:1px solid var(--border); border-radius:20px; padding:7px 16px; font-size:13px; cursor:pointer; background:#fff; color:var(--text); font-family:'DM Sans',sans-serif; transition:all 0.15s; }
+    .chip:hover { border-color:var(--curry); background:var(--curry-light); }
+    .chip.selected { background:var(--curry); border-color:var(--curry); color:#fff; font-weight:500; }
+    .info-box { background:var(--curry-light); border:0.5px solid rgba(196,98,26,0.3); border-radius:8px; padding:11px 14px; font-size:13px; color:var(--curry-dark); line-height:1.65; }
+    .end-date-box { display:none; margin-top:0.6rem; background:var(--curry-light); border:0.5px solid rgba(196,98,26,0.3); border-radius:8px; padding:11px 14px; font-size:13px; color:var(--curry-dark); line-height:1.7; }
+    .end-value { font-weight:500; color:var(--curry); font-size:14px; }
+    .end-meta { display:block; font-size:12px; color:var(--curry-dark); margin-top:3px; opacity:0.85; }
+    .price-box { display:none; margin-top:1rem; background:#fff; border:1.5px solid var(--curry); border-radius:10px; padding:14px 16px; }
+    .price-box-title { font-size:12px; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--curry); margin-bottom:10px; }
+    .price-amount { font-size:26px; font-weight:600; color:var(--curry-dark); }
+    .price-desc { font-size:12px; color:var(--muted); margin-top:3px; line-height:1.55; }
+    .price-etransfer { margin-top:10px; background:var(--curry-light); border-radius:6px; padding:9px 12px; font-size:12px; color:var(--curry-dark); line-height:1.6; }
+    .price-email { font-weight:500; color:var(--curry); }
+    .ack-field { display:flex; align-items:flex-start; gap:10px; margin-top:1.25rem; padding:12px 14px; background:#fff; border:1px solid var(--border); border-radius:8px; cursor:pointer; }
+    .ack-field input[type=checkbox] { margin-top:2px; accent-color:var(--curry); width:16px; height:16px; flex-shrink:0; cursor:pointer; }
+    .ack-label { font-size:13px; color:var(--text); line-height:1.55; cursor:pointer; }
+    .ack-field.has-error { border-color:#c0392b; }
+    .submit-btn { width:100%; background:var(--curry); color:#fff; border:none; border-radius:10px; padding:14px; font-size:15px; font-weight:500; font-family:'DM Sans',sans-serif; cursor:pointer; margin-top:1.75rem; letter-spacing:0.3px; transition:background 0.2s; }
+    .submit-btn:hover { background:var(--curry-dark); }
+    .submit-btn:disabled { background:#ccc; cursor:not-allowed; }
+    .error-msg { font-size:12px; color:#c0392b; margin-top:4px; display:none; }
+    .field.has-error input,.field.has-error select,.field.has-error textarea { border-color:#c0392b; }
+    .field.has-error .error-msg { display:block; }
+    #successScreen { display:none; text-align:center; padding:4rem 1.5rem; max-width:480px; margin:0 auto; }
+    #successScreen h2 { font-family:'Playfair Display',serif; font-size:26px; color:var(--curry); margin-bottom:8px; }
+    #successScreen p { font-size:14px; color:var(--muted); line-height:1.6; }
+    .spinner { display:inline-block; width:18px; height:18px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:8px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">Tiffin Order Form</div>
+      <h1>The Curry Kingdom<br>Tiffin Services</h1>
+      <p>Authentic Indian homestyle tiffin — crafted with love, delivered to your door.</p>
+    </div>
+  </div>
+
+  <div id="formBody" class="form-body">
+
+    <!-- PERSONAL DETAILS -->
+    <div class="section-label">Personal details</div>
+    <div class="grid2">
+      <div class="field" id="f-firstName">
+        <label class="field-label">First name <span class="req">*</span></label>
+        <input type="text" id="firstName" autocomplete="given-name" />
+        <div class="error-msg">Please enter your first name.</div>
+      </div>
+      <div class="field" id="f-lastName">
+        <label class="field-label">Last name <span class="req">*</span></label>
+        <input type="text" id="lastName" autocomplete="family-name" />
+        <div class="error-msg">Please enter your last name.</div>
+      </div>
+    </div>
+    <div class="field" id="f-phone">
+      <label class="field-label">Phone number <span class="req">*</span></label>
+      <input type="tel" id="phone" autocomplete="tel" />
+      <div class="error-msg">Please enter your phone number.</div>
+    </div>
+    <div class="field" id="f-email">
+      <label class="field-label">Email address <span class="req">*</span></label>
+      <input type="email" id="email" autocomplete="email" />
+      <div class="error-msg">Please enter a valid email address.</div>
+    </div>
+
+    <!-- DELIVERY ADDRESS -->
+    <div class="section-label">Delivery address</div>
+    <div class="grid3">
+      <div class="field" id="f-streetName">
+        <label class="field-label">Street name <span class="req">*</span></label>
+        <input type="text" id="streetName" />
+        <div class="error-msg">Street name is required.</div>
+      </div>
+      <div class="field" id="f-streetNo">
+        <label class="field-label">Street no. <span class="req">*</span></label>
+        <input type="text" id="streetNo" />
+        <div class="error-msg">Required.</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Unit / Apt</label>
+        <input type="text" id="unit" />
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field" id="f-city">
+        <label class="field-label">City <span class="req">*</span></label>
+        <input type="text" id="city" autocomplete="address-level2" />
+        <div class="error-msg">Please enter your city.</div>
+      </div>
+      <div class="field" id="f-postal">
+        <label class="field-label">Postal code <span class="req">*</span></label>
+        <input type="text" id="postal" autocomplete="postal-code" />
+        <div class="error-msg">Please enter your postal code.</div>
+      </div>
+    </div>
+    <div class="field" id="f-homeType">
+      <label class="field-label">Type of home <span class="req">*</span></label>
+      <select id="homeType">
+        <option value="">Select home type</option>
+        <option value="Condo / Apartment">Condo / Apartment</option>
+        <option value="House">House</option>
+      </select>
+      <div class="error-msg">Please select your home type.</div>
+    </div>
+
+    <!-- CHOOSE TIFFIN -->
+    <div class="section-label">Choose your tiffin</div>
+    <div class="meal-cards" id="mealCards">
+      <div class="meal-card" data-meal="Mini Meal" onclick="selectMeal(this)">
+        <input type="radio" name="meal" />
+        <div class="meal-name">Mini Meal</div>
+        <div class="meal-items">8oz dry sabji · 8oz gravy (dal/rajma/chhole/etc) · 2 roti · 8oz rice</div>
+      </div>
+      <div class="meal-card" data-meal="Squire Meal" onclick="selectMeal(this)">
+        <input type="radio" name="meal" />
+        <div class="meal-name">Squire Meal</div>
+        <div class="meal-serves">Serves 1–2</div>
+        <div class="meal-items">8oz dry sabji · 8oz gravy (dal/rajma/chhole/etc) · 4 roti · 12oz rice · fresh cut salad</div>
+      </div>
+      <div class="meal-card" data-meal="Queens Meal" onclick="selectMeal(this)">
+        <input type="radio" name="meal" />
+        <div class="meal-name">Queens Meal</div>
+        <div class="meal-serves">Serves 2–3</div>
+        <div class="meal-items">12oz dry sabji · 12oz gravy (dal/rajma/chhole/etc) · 8 roti · 16oz rice · fresh cut salad · papad · pickle</div>
+      </div>
+      <div class="meal-card" data-meal="King Meal" onclick="selectMeal(this)">
+        <input type="radio" name="meal" />
+        <div class="meal-name">King Meal</div>
+        <div class="meal-serves">Serves 3–4</div>
+        <div class="meal-items">16oz dry sabji · 16oz gravy (rajma/chhole/etc) · 16oz dal · 12 roti · 24oz rice · fresh cut salad · papad · pickle</div>
+      </div>
+    </div>
+    <div class="error-msg" id="mealError" style="margin-top:6px;">Please select a meal type.</div>
+
+    <!-- MEAL PREFERENCE -->
+    <div class="field" style="margin-top:1.25rem">
+      <label class="field-label">Meal preference <span class="req">*</span></label>
+      <div class="chip-group" id="mealPref">
+        <button type="button" class="chip" onclick="selectChip(this,'mealPref')">Veg</button>
+        <button type="button" class="chip" onclick="selectChip(this,'mealPref')">Veg + Egg</button>
+        <button type="button" class="chip" onclick="selectChip(this,'mealPref')">Veg + Non-Veg</button>
+      </div>
+      <div class="error-msg" id="mealPrefError">Please select a meal preference.</div>
+    </div>
+
+    <!-- CARB PREFERENCE -->
+    <div class="field">
+      <label class="field-label">Carb preference <span class="req">*</span></label>
+      <div class="chip-group" id="carbPref">
+        <button type="button" class="chip" onclick="selectChip(this,'carbPref')">Roti only</button>
+        <button type="button" class="chip" onclick="selectChip(this,'carbPref')">Rice only</button>
+        <button type="button" class="chip" onclick="selectChip(this,'carbPref')">Roti + Rice</button>
+      </div>
+      <div class="error-msg" id="carbPrefError">Please select a carb preference.</div>
+    </div>
+
+    <!-- SUBSCRIPTION FREQUENCY -->
+    <div class="section-label">Subscription frequency &amp; dates</div>
+    <div class="field">
+      <div class="chip-group" id="freqPref">
+        <button type="button" class="chip" onclick="selectChip(this,'freqPref')">One-day trial</button>
+        <button type="button" class="chip" onclick="selectChip(this,'freqPref')">Weekly</button>
+        <button type="button" class="chip" onclick="selectChip(this,'freqPref')">Monthly</button>
+      </div>
+      <div class="error-msg" id="freqPrefError">Please select a frequency.</div>
+    </div>
+
+    <!-- START DATE -->
+    <div class="field" id="f-startDate">
+      <label class="field-label">Start date <span class="req">*</span> <span style="font-size:11px;font-weight:400;color:var(--muted)">(weekdays Mon–Fri only)</span></label>
+      <input type="date" id="startDate" onchange="updateEndDate()" />
+      <div class="error-msg" id="startDateError">Please select a valid weekday start date.</div>
+    </div>
+
+    <!-- END DATE MESSAGE -->
+    <div class="end-date-box" id="endDateBox">
+      <span style="font-weight:500">Your end date will be: </span><span class="end-value" id="endDateText"></span>
+      <span class="end-meta" id="endDateMeta"></span>
+    </div>
+
+    <!-- PRICE BOX -->
+    <div class="price-box" id="priceBox">
+      <div class="price-box-title">Your tiffin cost</div>
+      <div class="price-amount" id="priceAmount"></div>
+      <div class="price-desc" id="priceDesc"></div>
+      <div class="price-etransfer">
+        Please send your Interac e-Transfer to <span class="price-email">payments@thecurrykingdom.com</span> to confirm your order. Use your full name as the message/note.
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="field" style="margin-top:1.25rem">
+      <label class="field-label">Additional notes / allergies</label>
+      <textarea id="notes"></textarea>
+    </div>
+
+    <!-- ACKNOWLEDGEMENT CHECKBOX -->
+    <div class="ack-field" id="ackField" onclick="toggleAck()">
+      <input type="checkbox" id="ackCheck" onclick="event.stopPropagation();toggleAck()" />
+      <label class="ack-label" for="ackCheck">
+        I understand that my tiffin order will be confirmed only after the e-Transfer payment has been received. I'm happy to proceed and will send my payment to <strong>payments@thecurrykingdom.com</strong> promptly.
+      </label>
+    </div>
+    <div class="error-msg" id="ackError" style="margin-top:4px;">Please acknowledge the payment confirmation to proceed.</div>
+
+    <div id="submitError" style="font-size:13px;color:#c0392b;text-align:center;margin-top:1rem;display:none;">Something went wrong. Please try again.</div>
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">Place my tiffin order →</button>
+
+  </div><!-- /formBody -->
+
+  <div id="successScreen">
+    <div style="font-size:48px;margin-bottom:1rem">🍛</div>
+    <h2>Order received!</h2>
+    <p>Thank you for choosing The Curry Kingdom.<br>We'll be in touch shortly to confirm your tiffin schedule.<br><br>
+    Please send your e-Transfer to <strong style="color:var(--curry)">payments@thecurrykingdom.com</strong> to get started.</p>
+  </div>
+
+  <script>
+    // ── Pricing table ─────────────────────────────────────────
+    // Keys: "MealType|Preference|Frequency"  (Preference: Veg / Egg / NonVeg)
+    var PRICES = {
+      'Mini Meal|Veg|Weekly':55,    'Mini Meal|Egg|Weekly':50,    'Mini Meal|NonVeg|Weekly':55,
+      'Mini Meal|Veg|Monthly':160,  'Mini Meal|Egg|Monthly':170,  'Mini Meal|NonVeg|Monthly':190,
+      'Squire Meal|Veg|Weekly':65,  'Squire Meal|Egg|Weekly':70,  'Squire Meal|NonVeg|Weekly':75,
+      'Squire Meal|Veg|Monthly':220,'Squire Meal|Egg|Monthly':230,'Squire Meal|NonVeg|Monthly':240,
+      'Queens Meal|Veg|Weekly':85,  'Queens Meal|Egg|Weekly':90,  'Queens Meal|NonVeg|Weekly':95,
+      'Queens Meal|Veg|Monthly':290,'Queens Meal|Egg|Monthly':310,'Queens Meal|NonVeg|Monthly':340,
+      'King Meal|Veg|Weekly':170,   'King Meal|Egg|Weekly':180,   'King Meal|NonVeg|Weekly':190,
+      'King Meal|Veg|Monthly':600,  'King Meal|Egg|Monthly':640,  'King Meal|NonVeg|Monthly':680
+    };
+
+    // ── Allowed date range: tomorrow or day-after depending on cutoff ──
+    (function setDateRange(){
+      var now = new Date();
+      // Toronto offset: EST=-300, EDT=-240. Use local time with a fixed 18:00 check.
+      // We convert to Toronto time via toLocaleString to get accurate hour
+      var torontoStr = now.toLocaleString('en-CA',{timeZone:'America/Toronto',hour:'numeric',hour12:false});
+      var torontoHour = parseInt(torontoStr, 10);
+      var earliest = new Date(now.toLocaleDateString('en-CA',{timeZone:'America/Toronto'}) + 'T00:00:00');
+      // advance by 1 day if before 6pm, else 2 days
+      earliest.setDate(earliest.getDate() + (torontoHour < 18 ? 1 : 2));
+      // skip to weekday if needed
+      while(earliest.getDay()===0||earliest.getDay()===6) earliest.setDate(earliest.getDate()+1);
+
+      // max = 1 month from today
+      var latest = new Date(now.toLocaleDateString('en-CA',{timeZone:'America/Toronto'}) + 'T00:00:00');
+      latest.setMonth(latest.getMonth()+1);
+
+      var el = document.getElementById('startDate');
+      el.min = earliest.toISOString().split('T')[0];
+      el.max = latest.toISOString().split('T')[0];
+    })();
+
+    function isWeekday(d){ var w=d.getDay(); return w!==0&&w!==6; }
+
+    function addWeekdays(start,n){
+      var d=new Date(start),added=0;
+      while(added<n){ d.setDate(d.getDate()+1); if(isWeekday(d)) added++; }
+      return d;
+    }
+
+    function countWeekdays(s,e){
+      var c=0,d=new Date(s);
+      while(d<=e){ if(isWeekday(d)) c++; d.setDate(d.getDate()+1); }
+      return c;
+    }
+
+    function fmtDate(d){
+      return d.toLocaleDateString('en-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    }
+
+    // ── Derive preference key (Veg / Egg / NonVeg) ───────────
+    function getPrefKey(){
+      var chip = document.querySelector('#mealPref .chip.selected');
+      if(!chip) return null;
+      var t = chip.textContent.trim();
+      if(t==='Veg') return 'Veg';
+      if(t==='Veg + Egg') return 'Egg';
+      return 'NonVeg';
+    }
+
+    // ── Update price box ──────────────────────────────────────
+    function updatePrice(){
+      var mealCard = document.querySelector('.meal-card.selected');
+      var freqChip = document.querySelector('#freqPref .chip.selected');
+      var pref     = getPrefKey();
+      var box      = document.getElementById('priceBox');
+
+      // One-day trial has no price row — hide
+      if(freqChip && freqChip.textContent.trim()==='One-day trial'){
+        box.style.display='none'; return;
+      }
+
+      if(!mealCard||!freqChip||!pref){ box.style.display='none'; return; }
+
+      var meal  = mealCard.dataset.meal;
+      var freq  = freqChip.textContent.trim();
+      var fKey  = freq==='Weekly'?'Weekly':'Monthly';
+      var key   = meal+'|'+pref+'|'+fKey;
+      var price = PRICES[key];
+
+      if(!price){ box.style.display='none'; return; }
+
+      var prefLabel = pref==='Veg'?'Veg': pref==='Egg'?'Veg + Egg':'Veg + Non-Veg';
+      document.getElementById('priceAmount').textContent = '$' + price + ' CAD';
+      document.getElementById('priceDesc').textContent   = meal + ' · ' + prefLabel + ' · ' + freq;
+      box.style.display = 'block';
+    }
+
+    // ── Update end date display ───────────────────────────────
+    function updateEndDate(){
+      var chip = document.querySelector('#freqPref .chip.selected');
+      var sv   = document.getElementById('startDate').value;
+      var box  = document.getElementById('endDateBox');
+      if(!sv){ box.style.display='none'; updatePrice(); return; }
+      var start = new Date(sv+'T00:00:00');
+      if(!isWeekday(start)){
+        box.style.display='block';
+        document.getElementById('endDateText').textContent='';
+        document.getElementById('endDateMeta').textContent='⚠ Please pick a weekday (Mon–Fri). Weekends are non-delivery days.';
+        updatePrice(); return;
+      }
+      if(!chip){ box.style.display='none'; updatePrice(); return; }
+      var freq=chip.textContent.trim(), end, note;
+      if(freq==='One-day trial'){
+        end=new Date(start); note='1 delivery only';
+      } else if(freq==='Weekly'){
+        end=addWeekdays(start,4);
+        note=countWeekdays(start,end)+' deliveries · Mon – Fri';
+      } else {
+        var raw=new Date(start); raw.setMonth(raw.getMonth()+1); raw.setDate(raw.getDate()-1);
+        while(!isWeekday(raw)) raw.setDate(raw.getDate()-1);
+        end=raw;
+        note='approx. '+countWeekdays(start,end)+' deliveries (weekdays only)';
+      }
+      box.style.display='block';
+      document.getElementById('endDateText').textContent=fmtDate(end);
+      document.getElementById('endDateMeta').textContent=note+' · Saturdays & Sundays are non-delivery days.';
+      updatePrice();
+    }
+
+    // ── Selections ────────────────────────────────────────────
+    function selectMeal(card){
+      document.querySelectorAll('.meal-card').forEach(function(c){c.classList.remove('selected');});
+      card.classList.add('selected');
+      document.getElementById('mealError').style.display='none';
+      updatePrice();
+    }
+
+    function selectChip(btn,gid){
+      document.querySelectorAll('#'+gid+' .chip').forEach(function(c){c.classList.remove('selected');});
+      btn.classList.add('selected');
+      var e=document.getElementById(gid+'Error'); if(e) e.style.display='none';
+      if(gid==='freqPref') updateEndDate();
+      updatePrice();
+    }
+
+    function toggleAck(){
+      var cb = document.getElementById('ackCheck');
+      cb.checked = !cb.checked;
+      document.getElementById('ackField').classList.remove('has-error');
+      document.getElementById('ackError').style.display='none';
+    }
+
+    // ── Validation ────────────────────────────────────────────
+    function validate(){
+      var ok=true;
+      function req(wid,iid,fn){
+        var w=document.getElementById(wid),v=(document.getElementById(iid)||{}).value||'';
+        v=v.trim(); var p=fn?fn(v):v!=='';
+        if(w) w.classList.toggle('has-error',!p); if(!p) ok=false;
+      }
+      req('f-firstName','firstName'); req('f-lastName','lastName');
+      req('f-phone','phone');
+      req('f-email','email',function(v){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);});
+      req('f-streetName','streetName'); req('f-streetNo','streetNo');
+      req('f-city','city'); req('f-postal','postal'); req('f-homeType','homeType');
+
+      var ms=!!document.querySelector('.meal-card.selected');
+      document.getElementById('mealError').style.display=ms?'none':'block'; if(!ms) ok=false;
+
+      ['mealPref','carbPref','freqPref'].forEach(function(id){
+        var s=document.querySelector('#'+id+' .chip.selected'),e=document.getElementById(id+'Error');
+        if(e) e.style.display=s?'none':'block'; if(!s) ok=false;
+      });
+
+      var sv=document.getElementById('startDate').value;
+      var sf=document.getElementById('f-startDate'),se=document.getElementById('startDateError'),sok=false;
+      if(sv){
+        var d=new Date(sv+'T00:00:00');
+        if(!isWeekday(d)){se.textContent='Start date must be a weekday (Mon–Fri).';se.style.display='block';sf.classList.add('has-error');}
+        else{sok=true;se.style.display='none';sf.classList.remove('has-error');}
+      } else {se.textContent='Please select a start date.';se.style.display='block';sf.classList.add('has-error');}
+      if(!sok) ok=false;
+
+      var ack=document.getElementById('ackCheck').checked;
+      if(!ack){
+        document.getElementById('ackField').classList.add('has-error');
+        document.getElementById('ackError').style.display='block';
+        ok=false;
+      }
+      return ok;
+    }
+
+    // ── Submit ────────────────────────────────────────────────
+    async function submitForm(){
+      if(!validate()) return;
+      var btn=document.getElementById('submitBtn');
+      btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Sending...';
+
+      var priceEl = document.getElementById('priceAmount');
+      var data={
+        firstName:document.getElementById('firstName').value.trim(),
+        lastName:document.getElementById('lastName').value.trim(),
+        phone:document.getElementById('phone').value.trim(),
+        email:document.getElementById('email').value.trim(),
+        streetNo:document.getElementById('streetNo').value.trim(),
+        streetName:document.getElementById('streetName').value.trim(),
+        unit:document.getElementById('unit').value.trim(),
+        city:document.getElementById('city').value.trim(),
+        postal:document.getElementById('postal').value.trim(),
+        homeType:document.getElementById('homeType').value,
+        mealType:(document.querySelector('.meal-card.selected')||{}).dataset.meal||'',
+        mealPref:(document.querySelector('#mealPref .chip.selected')||{}).textContent||'',
+        carbPref:(document.querySelector('#carbPref .chip.selected')||{}).textContent||'',
+        frequency:(document.querySelector('#freqPref .chip.selected')||{}).textContent||'',
+        startDate:document.getElementById('startDate').value,
+        endDate:document.getElementById('endDateText').textContent||'',
+        price:priceEl?priceEl.textContent:'',
+        notes:document.getElementById('notes').value.trim(),
+        submittedAt:new Date().toLocaleString('en-CA',{timeZone:'America/Toronto'})
+      };
+
+      var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxibTjzojYQOkM9m11-wGATizTzJC6sFZlaOC2jm98rkEoWj0QmtR8dNxWmpg54WYI-zg/exec';
+      try{
+        await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+        document.getElementById('formBody').style.display='none';
+        document.getElementById('successScreen').style.display='block';
+        window.scrollTo({top:0,behavior:'smooth'});
+      } catch(e){
+        document.getElementById('submitError').style.display='block';
+        btn.disabled=false; btn.innerHTML='Place my tiffin order →';
+      }
+    }
+  </script>
+</body>
+</html>
